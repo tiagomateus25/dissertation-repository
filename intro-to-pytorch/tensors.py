@@ -63,7 +63,7 @@ tensor[:,1] = 0
 t1 = torch.cat([tensor, tensor, tensor], dim=1)
 #print(t1)
 
-# arithmetic operations -------------------------------------------------------------------------------------
+# arithmetic operations 
 
 # This computes the matrix multiplication between two tensors. y1, y2, y3 will have the same value
 # ``tensor.T`` returns the transpose of a tensor
@@ -76,7 +76,37 @@ torch.matmul(tensor, tensor.T, out=y3)
 # This computes the element-wise product. z1, z2, z3 will have the same value
 z1 = tensor * tensor
 z2 = tensor.mul(tensor)
-print(z1)
+
 z3 = torch.rand_like(tensor)
 torch.mul(tensor, tensor, out=z3)
-print(z3)
+
+# single-element tensors
+
+agg = tensor.sum()
+agg_item = agg.item()
+print(agg_item, type(agg_item))
+
+# in-place operations
+
+print(f"{tensor} \n")
+tensor.add_(5)
+print(tensor)
+
+# bridge with numpy -----------------------------------------------------------------------------------------
+# tensor do numpy array
+
+t = torch.ones(5)
+print(f"t: {t}")
+n = t.numpy()
+print(f"n: {n}")
+
+t.add_(1)
+print(f"t: {t}")
+print(f"n: {n}")
+
+# numpy array to tensor
+n = np.ones(5)
+t = torch.from_numpy(n)
+np.add(n, 1, out=n)
+print(f"t: {t}")
+print(f"n: {n}")
