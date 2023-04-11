@@ -36,7 +36,7 @@ class ShowerEnv(Env):
         info = {}
 
         # return self.state, reward, done, info
-        return np.array(self.state, dtype=np.float32), reward, done, False, {}
+        return np.array(self.state, dtype=np.float32), reward, done, False
     def render(self):
         # implement visualization
         pass
@@ -62,4 +62,4 @@ for episode in range(1, episodes+1):
         n_state, reward, done, info = env.step(action)
         score += reward
     print('Episode:{} Score:{}'.format(episode, score))
-# env.close()
+env.close()
