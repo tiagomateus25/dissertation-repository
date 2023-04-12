@@ -36,7 +36,7 @@ class ShowerEnv(Env):
         info = {}
 
         # return self.state, reward, done, info
-        return np.array(self.state, dtype=np.float32), reward, done, False
+        return np.array(self.state, dtype=np.float32), reward, done, info
     def render(self):
         # implement visualization
         pass

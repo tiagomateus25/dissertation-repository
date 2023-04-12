@@ -6,16 +6,16 @@ import matplotlib
 import matplotlib.pyplot as plt
 from collections import namedtuple, deque
 from itertools import count
-
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-from custom_gym_env_shower_example import ShowerEnv
+from env import env
 
-env=ShowerEnv()
-
+env=env()
+# env= gym.make('CartPole-v1')
 
 # set up matplotlib
 is_ipython = 'inline' in matplotlib.get_backend()
@@ -70,9 +70,9 @@ class DQN(nn.Module):
 # LR is the learning rate of the AdamW optimizer
 BATCH_SIZE = 128
 GAMMA = 0.99
-EPS_START = 0.9
-EPS_END = 0.05
-EPS_DECAY = 1000
+EPS_START = 1.0
+EPS_END = 0.02
+EPS_DECAY = 10000
 TAU = 0.005
 LR = 1e-4
 
@@ -184,7 +184,7 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 600
+    num_episodes = 500
 else:
     num_episodes = 600
 
