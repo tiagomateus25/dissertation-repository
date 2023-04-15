@@ -12,10 +12,11 @@ import os
 
 class env(Env):
     def __init__(self):
-        high = 10
+        high = 1
         low = -high
 
-        # four actions: 0 - open coils, 1 - invert coil's polarity, 2 - do nothing
+        # four actions: 0 - open coils, 1 - close coils, 2 - invert coil's polarity, 3 - do nothing
+        # self.action_space = Discrete(4)
         self.action_space = Discrete(3)
         
         self._action_to_voltage = {
@@ -29,39 +30,50 @@ class env(Env):
         self.observation_space = Box(low=np.array([low]), high=np.array([high]), dtype=np.float32)
 
     def reset(self):
-        # operating time
-        self.operation_time = 5
-        
+        # # set the operation time
+        # self.operation_time = 100
+
         # the initial measurement of the induced potential difference
-        self.initial_state = np.array([random.randint(-10,10)]).astype(float)   
+        self.initial_state = np.array([random.randint(-1,1)]).astype(float)
         return np.array(self.initial_state, dtype=np.float32), {}
 
+        # self.initial_state = random.randint(-1,1)
+        # return self.initial_state, {}
+    
     def step(self, action):
-        # choose an action
-        voltage = self._action_to_voltage[action]
-        self.state = self.initial_state * voltage
+        # # choose an action
+        # voltage = self._action_to_voltage[action]
+        # self.state = self.initial_state * voltage
+        self.state = self.initial_state * (action - 1)
 
-        # decrease operation time
-        self.operation_time -= 1
+        # # decrease the operation time
+        # self.operation_time -= 1
 
-        if self.state >= self.initial_state :
-            reward = 1
-            if self.state > 0:
-                reward += 1
-            # terminated = False
-        else:
-            reward = -1
-            # terminated = True
-        
-        if self.operation_time <= 0:
+        if self.state > self.initial_state and self.state > 0:
+            reward = 10
+            terminated = False
+        elif self.state > self.initial_state and self.state == 0:
+            reward = 5
+            terminated = False
+        elif self.state == self.initial_state and self.state > 0: # keep positive induced voltage
+            reward = 10
+            terminated = False
+        elif self.initial_state == 0:
+            reward = 0
             terminated = True
         else:
-            terminated = False
+            reward = -10
+            terminated = True
+
+        # if self.operation_time == 0:
+        #     terminated = True
+        # else:
+        #     terminated = False
 
         info = {}
-
-        return np.array(self.state, dtype=np.float32), reward, terminated, info
-    
+        
+        return np.array(self.state, dtype=np.float32), reward, terminated, False, info
+        # return self.state, reward, terminated, info
     def render():
         pass
 
@@ -69,18 +81,23 @@ class env(Env):
         pass
 
 
-# test env   
-env = env()
+# # test env   
+# env = env()
+# print(env.observation_space.sample())
+# print(env.action_space.sample())
 
-episodes = 20
-for episode in range(1, episodes+1):
-    state = env.reset()
-    done = False
-    score = 0
+# episodes = 100
+# for episode in range(1, episodes+1):
+#     state = env.reset()
+#     terminated = False
+#     truncated = False
+#     score = 0
 
-    while not done:
-        action = env.action_space.sample()
-        n_state, reward, terminated, info = env.step(action)
-        score += reward
-    print('Episode:{} Score:{}'.format(episode, score))
-env.close()
+#     while not terminated or truncated:
+#         action = env.action_space.sample()
+#         # n_state, reward, terminated, truncated, info = env.step(action)
+#         n_state, reward, terminated, info = env.step(action)
+#         score += reward
+#     print('Episode:{} Score:{}'.format(episode, score))
+# env.close()
+

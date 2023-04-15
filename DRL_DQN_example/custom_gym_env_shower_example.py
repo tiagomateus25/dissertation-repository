@@ -36,7 +36,7 @@ class ShowerEnv(Env):
         info = {}
 
         # return self.state, reward, done, info
-        return np.array(self.state, dtype=np.float32), reward, done, info
+        return np.array(self.state, dtype=np.float32), reward, done, False, info
     def render(self):
         # implement visualization
         pass
@@ -44,8 +44,8 @@ class ShowerEnv(Env):
         self.state = np.array([38+random.randint(-3,3)]).astype(float)
         self.shower_length = 60
         # return self.state
-        return np.array(self.state, dtype=np.float32), {}
-
+        return np.array(self.state, dtype=np.float32)
+    
 env = ShowerEnv()
 print(env.observation_space.sample())
 print(env.action_space.sample())
@@ -59,7 +59,7 @@ for episode in range(1, episodes+1):
 
     while not done or truncated:
         action = env.action_space.sample()
-        n_state, reward, done, info = env.step(action)
+        n_state, reward, done, truncated, info = env.step(action)
         score += reward
     print('Episode:{} Score:{}'.format(episode, score))
 env.close()
