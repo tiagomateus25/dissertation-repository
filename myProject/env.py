@@ -30,15 +30,11 @@ class env(Env):
         self.observation_space = Box(low=np.array([low]), high=np.array([high]), dtype=np.float32)
 
     def reset(self):
-        # # set the operation time
-        # self.operation_time = 100
+
 
         # the initial measurement of the induced potential difference
         self.initial_state = np.array([random.randint(-1,1)]).astype(float)
-        return np.array(self.initial_state, dtype=np.float32), {}
-
-        # self.initial_state = random.randint(-1,1)
-        # return self.initial_state, {}
+        return np.array(self.initial_state, dtype=np.float32)
     
     def step(self, action):
         # # choose an action
@@ -51,13 +47,13 @@ class env(Env):
 
         if self.state > self.initial_state and self.state > 0:
             reward = 10
-            terminated = False
+            terminated = True
         elif self.state > self.initial_state and self.state == 0:
             reward = 5
-            terminated = False
+            terminated = True
         elif self.state == self.initial_state and self.state > 0: # keep positive induced voltage
             reward = 10
-            terminated = False
+            terminated = True
         elif self.initial_state == 0:
             reward = 0
             terminated = True
@@ -72,8 +68,8 @@ class env(Env):
 
         info = {}
         
-        return np.array(self.state, dtype=np.float32), reward, terminated, False, info
-        # return self.state, reward, terminated, info
+        # return np.array(self.state, dtype=np.float32), reward, terminated, False, info
+        return np.array(self.state, dtype=np.float32), reward, terminated, info
     def render():
         pass
 

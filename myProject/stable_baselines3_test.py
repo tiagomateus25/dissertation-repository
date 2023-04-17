@@ -9,4 +9,4 @@ from env import env
 env = env()
 log_path = os.path.join('Training', 'logs')
 model = DQN('MlpPolicy', env, verbose = 1, tensorboard_log=log_path)
-model.learn(total_timesteps=500000)
+model.learn(total_timesteps=80000)
