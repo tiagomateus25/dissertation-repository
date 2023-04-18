@@ -14,7 +14,6 @@ sock.bind(server_address)
 print('Waiting for communication.')
 # Listen for incoming connections
 sock.listen(1)
-# connection, client_address = sock.accept()
 
 while True:
 
@@ -27,6 +26,3 @@ while True:
 
     print('Value received: ', data.decode('utf8'))
     # print('Value received: ', json.loads(data.decode()))
-
-    # time.sleep(1)
-    # connection.close()
