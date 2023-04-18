@@ -15,4 +15,3 @@ while True:
     # sock.connect(server_address)
     data = sock.recv(1024)
     print('Value received: ', data.decode('utf8'))
-    time.sleep(1)
