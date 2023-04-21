@@ -12,6 +12,7 @@ import os
 
 class env(Env):
     def __init__(self):
+
         high = 1
         low = -high
 
@@ -31,28 +32,26 @@ class env(Env):
 
     def reset(self):
 
-
         # the initial measurement of the induced potential difference
         self.initial_state = np.array([random.randint(-1,1)]).astype(float)
+
         return np.array(self.initial_state, dtype=np.float32)
     
     def step(self, action):
-        # # choose an action
-        # voltage = self._action_to_voltage[action]
-        # self.state = self.initial_state * voltage
-        self.state = self.initial_state * (action - 1)
 
-        # # decrease the operation time
-        # self.operation_time -= 1
+        # choose an action
+        voltage = self._action_to_voltage[action]
+        self.state = self.initial_state * voltage
 
+        # reward process
         if self.state > self.initial_state and self.state > 0:
+            reward = 10
+            terminated = True
+        elif self.state == self.initial_state and self.state > 0: # keep positive induced voltage
             reward = 10
             terminated = True
         elif self.state > self.initial_state and self.state == 0:
             reward = 5
-            terminated = True
-        elif self.state == self.initial_state and self.state > 0: # keep positive induced voltage
-            reward = 10
             terminated = True
         elif self.initial_state == 0:
             reward = 0
@@ -61,15 +60,11 @@ class env(Env):
             reward = -10
             terminated = True
 
-        # if self.operation_time == 0:
-        #     terminated = True
-        # else:
-        #     terminated = False
-
+        # info
         info = {}
         
-        # return np.array(self.state, dtype=np.float32), reward, terminated, False, info
         return np.array(self.state, dtype=np.float32), reward, terminated, info
+    
     def render():
         pass
 
@@ -91,7 +86,6 @@ class env(Env):
 
 #     while not terminated or truncated:
 #         action = env.action_space.sample()
-#         # n_state, reward, terminated, truncated, info = env.step(action)
 #         n_state, reward, terminated, info = env.step(action)
 #         score += reward
 #     print('Episode:{} Score:{}'.format(episode, score))

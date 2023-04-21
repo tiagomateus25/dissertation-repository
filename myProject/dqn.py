@@ -51,7 +51,9 @@ class ReplayMemory(object):
 # EPS_DECAY controls the rate of exponential decay of epsilon, higher means a slower decay
 # TAU is the update rate of the target network
 # LR is the learning rate of the AdamW optimizer
-BATCH_SIZE = 128
+
+# BATCH_SIZE = 128    # original
+BATCH_SIZE = 64
 GAMMA = 0.99
 EPS_START = 1.0
 EPS_END = 0.02
@@ -63,16 +65,21 @@ class DQN(nn.Module):
 
     def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
-        self.layer1 = nn.Linear(n_observations, 128)
-        self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, n_actions)
+        # self.layer1 = nn.Linear(n_observations, 128)
+        # self.layer2 = nn.Linear(128, 128)
+        # self.layer3 = nn.Linear(128, n_actions)
+
+        self.layer1 = nn.Linear(n_observations, 64)
+        self.layer2 = nn.Linear(64, n_actions)
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
     def forward(self, x):
         x = F.relu(self.layer1(x))
-        x = F.relu(self.layer2(x))
-        return self.layer3(x)
+        # x = F.relu(self.layer2(x))
+        # return self.layer3(x)
+    
+        return self.layer2(x)
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
@@ -180,9 +187,9 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 1000000
+    num_episodes = 50000
 else:
-    num_episodes = 1000000
+    num_episodes = 50000
 
 for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
@@ -190,9 +197,9 @@ for i_episode in range(num_episodes):
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
         action = select_action(state)
-        observation, reward, terminated, truncated, _ = env.step(action.item())
+        observation, reward, terminated, info = env.step(action.item())
         reward = torch.tensor([reward], device=device)
-        done = terminated or truncated
+        done = terminated
 
         if terminated:
             next_state = None
