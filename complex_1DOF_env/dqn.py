@@ -12,9 +12,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-from complex_env import env_1d
+from complex_1DOF_env import complex_1DOF_env
 
-env = env_1d()
+env = complex_1DOF_env()
 
 # set up matplotlib
 is_ipython = 'inline' in matplotlib.get_backend()

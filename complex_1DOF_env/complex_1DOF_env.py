@@ -8,7 +8,7 @@ import time
 
 eng = matlab.engine.start_matlab()
 
-class env_1d(Env):
+class complex_1DOF_env(Env):
     def __init__(self):
         # truncation
         self.steps = 0
@@ -92,7 +92,7 @@ class env_1d(Env):
 
 
 # test env 
-# env = env_1d()
+# env = complex_1DOF_env()
 
 # episodes = 1
 # for episode in range(1, episodes+1):
