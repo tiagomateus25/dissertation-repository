@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-
+import time
 from complex_1DOF_env import complex_1DOF_env
 
 env = complex_1DOF_env()
@@ -226,6 +226,13 @@ for i_episode in range(num_episodes):
             episode_durations.append(t + 1)
             plot_durations()
             break
+        
+    if truncated:
+        # Save trained neural network weights
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
+        torch.save(policy_net.state_dict(), nn_filename)
+        break
 
 print('Complete')
 plot_durations(show_result=True)
