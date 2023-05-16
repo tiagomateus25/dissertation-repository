@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 env = complex_1DOF_env()
 env.reset()
 
-LEARNING_RATE = 0.1
+LEARNING_RATE = 1e-4
 DISCOUNT = 0.95
 EPISODES = 25000
 
 SHOW_EVERY = 500
 
-DISCRETE_OS_SIZE = [200] * len(env.observation_space.high)
+DISCRETE_OS_SIZE = [40] * len(env.observation_space.high)
 discrete_os_win_size = (env.observation_space.high - env.observation_space.low) / DISCRETE_OS_SIZE
 
 
@@ -68,14 +68,14 @@ for episode in range(EPISODES):
     
     ep_rewards.append(episode_reward)
 
-    # if not episode % SHOW_EVERY:
-    average_reward = sum(ep_rewards[-SHOW_EVERY:]) / len(ep_rewards[-SHOW_EVERY:])
-    aggr_ep_rewards['ep'].append(episode)
-    aggr_ep_rewards['avg'].append(average_reward)
-    aggr_ep_rewards['min'].append(min(ep_rewards[-SHOW_EVERY:]))
-    aggr_ep_rewards['max'].append(max(ep_rewards[-SHOW_EVERY:]))
+    if not episode % SHOW_EVERY:
+        average_reward = sum(ep_rewards[-SHOW_EVERY:]) / len(ep_rewards[-SHOW_EVERY:])
+        aggr_ep_rewards['ep'].append(episode)
+        aggr_ep_rewards['avg'].append(average_reward)
+        aggr_ep_rewards['min'].append(min(ep_rewards[-SHOW_EVERY:]))
+        aggr_ep_rewards['max'].append(max(ep_rewards[-SHOW_EVERY:]))
 
-    print(f'Episode: {episode} avg: {average_reward} min: {min(ep_rewards[-SHOW_EVERY:])} max: {max(ep_rewards[-SHOW_EVERY:])}')
+        print(f'Episode: {episode} avg: {average_reward} min: {min(ep_rewards[-SHOW_EVERY:])} max: {max(ep_rewards[-SHOW_EVERY:])}')
 
 
 env.close()
