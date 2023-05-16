@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import gymnasium as gym
 from gym import Env
 from gym.spaces import Discrete, Box
 import numpy as np
@@ -10,6 +9,11 @@ eng = matlab.engine.start_matlab()
 
 class complex_1DOF_env(Env):
     def __init__(self):
+
+        # frequencies
+        self.init_freq = 1
+        self.last_freq = 6
+
         # truncation
         self.steps = 0
         self.max_episode_steps = 1000
@@ -17,7 +21,7 @@ class complex_1DOF_env(Env):
         # low states
         low = np.array(
             [
-                1,
+                self.init_freq,
                 0,
                 0,
             ],
@@ -27,7 +31,7 @@ class complex_1DOF_env(Env):
         # high states
         high = np.array(
             [
-                6,
+                self.last_freq,
                 100,
                 100
             ],
@@ -42,7 +46,7 @@ class complex_1DOF_env(Env):
 
     def reset(self):
         # reset state
-        self.state = np.array([1, 0, 0], dtype=np.float32)
+        self.state = np.array([self.init_freq, 0, 0], dtype=np.float32)
 
         # return reset state
         return np.array(self.state, dtype=np.float32)
@@ -61,8 +65,8 @@ class complex_1DOF_env(Env):
         total_AvPow = self.current_state[1] + AveragePower
 
         # check terminal condition and calculate reward
-        if new_freq == 6:
-            self.state = np.array([1, 0, total_AvPow], dtype=np.float32)
+        if new_freq == self.last_freq:
+            self.state = np.array([self.init_freq, 0, total_AvPow], dtype=np.float32)
             if  self.state[2] < self.current_state[2]:
                 reward = -10
                 terminated = True
@@ -91,7 +95,8 @@ class complex_1DOF_env(Env):
         pass
 
 
-# test env 
+# test env
+
 # env = complex_1DOF_env()
 
 # episodes = 1
