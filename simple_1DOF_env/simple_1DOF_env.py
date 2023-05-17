@@ -7,6 +7,7 @@ import matlab.engine
 from typing import Optional
 import time
 import matplotlib.pyplot as plt
+import math
 
 eng = matlab.engine.start_matlab()
 
@@ -19,7 +20,7 @@ class simple_1DOF_env(Env):
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 1000
+        self.max_episode_steps = 50
 
         # low states
         low = np.array(
@@ -47,8 +48,8 @@ class simple_1DOF_env(Env):
 
         # render
         self.render_mode = render_mode
-        self.x = []
-        self.y = []
+        self.x = np.array([])
+        self.y = np.array([])
 
     def reset(self):
         # reset state
@@ -69,18 +70,22 @@ class simple_1DOF_env(Env):
         if self.render_mode == 'human':
             self.render()
 
-        # check if truncated
-        self.steps += 1
-        truncated = self.steps >= self.max_episode_steps
-
         # check terminal condition and calculate reward
         if self.state[1] < self.current_state[1]:
             reward = -10
             terminated = True
-            self.steps = 0
         else:
             reward = 1
             terminated = False
+
+        # check if truncated
+        self.steps += 1
+        truncated = self.steps >= self.max_episode_steps
+
+        # reset steps if terminated or truncated
+        done = terminated or truncated
+        if done:
+            self.steps = 0
 
         # info 
         info = {}
@@ -100,45 +105,47 @@ class simple_1DOF_env(Env):
         if self.render_mode == 'human':
             
             # x axis: step
-            self.x.append(self.steps)
+            self.x = np.append(self.x, self.steps)
 
             # y axis: average power
-            self.y.append(self.state[1])
+            self.y = np.append(self.y, self.state[1])
             
     def close(self):
-        # check values
-        # print(self.x)
-        # print(self.y)
-
         # plot results
-        plt.plot(self.x, self.y, 'b-')
-        self.x = []
-        self.y = []
+        self.fig = plt.figure(2)
+        plt.scatter(self.x, self.y)
+        plt.plot(self.x, self.y)
+        plt.xlabel('Steps')
+        plt.ylabel('Average Power (W)')
+        plt.title('Average power per step')
+        self.x = np.array([])
+        self.y = np.array([])
+        plt.pause(0.001)
     
 
 # test env
-
-env = simple_1DOF_env(render_mode='human')
-
-episodes = 5
-for episode in range(1, episodes+1):
-    state = env.reset()
-    terminated = False
-    truncated = False
-    score = 0
-    steps = 0
-    start = time.time()
-    while not terminated and not truncated:
-        action = env.action_space.sample()
-        n_state, reward, terminated, truncated, info = env.step(action)
-        score += reward
-        steps+= 1
-    print('Episode:{} Score:{}'.format(episode, score))
-    print('Number of steps:', steps)
-    end = time.time()
-    print('Elapsed time is', end - start, 'seconds.')
-    env.close()
-    if episode != episodes:
-        plt.close()
-    plt.show()
+# env = simple_1DOF_env(render_mode='human')
+# episodes = 5
+# for episode in range(1, episodes+1):
+#     state = env.reset()
+#     terminated = False
+#     truncated = False
+#     score = 0
+#     steps = 0
+#     start = time.time()
+#     while not terminated and not truncated:
+#         action = env.action_space.sample()
+#         n_state, reward, terminated, truncated, info = env.step(action)
+#         score += reward
+#         steps+= 1
+#     print('Episode:{} Score:{}'.format(episode, score))
+#     print('Number of steps:', steps)
+#     end = time.time()
+#     print('Elapsed time:', end - start, 'seconds.')
+#     if env.render_mode == 'human':
+#         env.close()
+#         if episode != episodes:
+#             plt.close()
+#         else:
+#             env.fig.savefig('plot.png')
 

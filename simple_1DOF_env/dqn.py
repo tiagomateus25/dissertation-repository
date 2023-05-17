@@ -14,7 +14,7 @@ import torch.nn.functional as F
 import time
 from simple_1DOF_env import simple_1DOF_env
 
-env = simple_1DOF_env()
+env = simple_1DOF_env(render_mode='human')
 
 # set up matplotlib
 is_ipython = 'inline' in matplotlib.get_backend()
@@ -53,7 +53,7 @@ class ReplayMemory(object):
 # LR is the learning rate of the AdamW optimizer
 
 # BATCH_SIZE = 128    # original
-BATCH_SIZE = 256
+BATCH_SIZE = 128
 GAMMA = 0.99
 EPS_START = 1.0
 EPS_END = 0.02
@@ -77,7 +77,7 @@ class DQN(nn.Module):
         x = F.relu(self.layer2(x))
 
         return self.layer3(x)
-
+        
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
@@ -186,17 +186,18 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 50000
+    num_episodes = 1000
 else:
-    num_episodes = 50000
+    num_episodes = 1000
 
+start = time.time()
 for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
     state = env.reset()
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
         action = select_action(state)
-        observation, reward, terminated, truncated ,info = env.step(action.item())
+        observation, reward, terminated, truncated , _ = env.step(action.item())
         reward = torch.tensor([reward], device=device)
         done = terminated or truncated
 
@@ -226,15 +227,23 @@ for i_episode in range(num_episodes):
             episode_durations.append(t + 1)
             plot_durations()
             break
-        
-    if truncated:
-        # Save trained neural network weights
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
-        torch.save(policy_net.state_dict(), nn_filename)
-        break
+    # if truncated:
+    #     # Save trained neural network weights
+    #     timestr = time.strftime("%Y%m%d-%H%M%S")
+    #     nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
+    #     torch.save(policy_net.state_dict(), nn_filename)
+    #     break
 
+    # if env.render_mode == 'human':
+    #     env.close()
+    #     if i_episode != num_episodes-1:
+    #         plt.close(2)
+    #     else:
+    #         env.fig.savefig('plot.png')
+
+end = time.time()
 print('Complete')
+print('Elapsed time:', end - start, 'seconds.')
 plot_durations(show_result=True)
 plt.ioff()
 plt.show()
