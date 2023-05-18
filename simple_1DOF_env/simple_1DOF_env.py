@@ -103,7 +103,6 @@ class simple_1DOF_env(Env):
             return
         
         if self.render_mode == 'human':
-            
             # x axis: step
             self.x = np.append(self.x, self.steps)
 
