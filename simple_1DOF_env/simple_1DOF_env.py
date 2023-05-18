@@ -20,7 +20,7 @@ class simple_1DOF_env(Env):
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 50
+        self.max_episode_steps = 20
 
         # low states
         low = np.array(
@@ -72,7 +72,7 @@ class simple_1DOF_env(Env):
 
         # check terminal condition and calculate reward
         if self.state[1] < self.current_state[1]:
-            reward = -10
+            reward = -100
             terminated = True
         else:
             reward = 1
