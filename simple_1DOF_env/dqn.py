@@ -55,26 +55,26 @@ class ReplayMemory(object):
 # BATCH_SIZE = 128    # original
 BATCH_SIZE = 128
 GAMMA = 0.99
-EPS_START = 1.0
-EPS_END = 0.02
+EPS_START = 0.9
+EPS_END = 0 # maybe change to 0.01
 EPS_DECAY = 1000
 TAU = 0.005
-LR = 1e-4
+LR = 1e-3
     
 class DQN(nn.Module):
 
     def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
-        self.layer1 = nn.Linear(n_observations, 128)
-        self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, n_actions)
+        self.layer1 = nn.Linear(n_observations, 32)  # maybe change to 32
+        # self.layer2 = nn.Linear(64, 64)
+        self.layer3 = nn.Linear(32, n_actions)
 
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
     def forward(self, x):
         x = F.relu(self.layer1(x))
-        x = F.relu(self.layer2(x))
+        # x = F.relu(self.layer2(x))
 
         return self.layer3(x)
         
@@ -223,27 +223,35 @@ for i_episode in range(num_episodes):
             target_net_state_dict[key] = policy_net_state_dict[key]*TAU + target_net_state_dict[key]*(1-TAU)
         target_net.load_state_dict(target_net_state_dict)
 
+        # chech if terminated or truncated
         if done:
             episode_durations.append(t + 1)
             plot_durations()
             break
-    # if truncated:
-    #     # Save trained neural network weights
-    #     timestr = time.strftime("%Y%m%d-%H%M%S")
-    #     nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
-    #     torch.save(policy_net.state_dict(), nn_filename)
-    #     break
 
-    # if env.render_mode == 'human':
-    #     env.close()
-    #     if i_episode != num_episodes-1:
-    #         plt.close(2)
-    #     else:
-    #         env.fig.savefig('plot.png')
+    # save last plot
+    if env.render_mode == 'human':
+        env.close()
+        if i_episode != num_episodes-1:
+            plt.close(2)
+        else:
+            env.fig.savefig('plot.png')
 
+# save trained neural network weights
+timestr = time.strftime("%Y%m%d-%H%M%S")
+nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
+torch.save(policy_net.state_dict(), nn_filename)
+
+# end time
 end = time.time()
+
+# complete
 print('Complete')
+
+# elapsed time
 print('Elapsed time:', end - start, 'seconds.')
+
+# results plot
 plot_durations(show_result=True)
 plt.ioff()
 plt.show()

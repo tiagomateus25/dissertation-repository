@@ -3,24 +3,25 @@
 from simple_1DOF_env import simple_1DOF_env
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
-env = simple_1DOF_env()
+env = simple_1DOF_env(render_mode='human')
 env.reset()
 
-LEARNING_RATE = 1e-4
-DISCOUNT = 0.95
-EPISODES = 25000
+LEARNING_RATE = 0.1
+DISCOUNT = 0.99
+EPISODES = 150
 
-SHOW_EVERY = 500
+SHOW_EVERY = 10
 
-DISCRETE_OS_SIZE = [40] * len(env.observation_space.high)
+DISCRETE_OS_SIZE = [8, 8] #* len(env.observation_space.high)
 discrete_os_win_size = (env.observation_space.high - env.observation_space.low) / DISCRETE_OS_SIZE
 
-
-epsilon = 0.5
+epsilon = 1
 START_EPSILON_DECAYING = 1
-END_EPSILON_DECAYING = EPISODES // 2
-epsilon_decay_value = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING)
+END_EPSILON_DECAYING = 1000 
+# epsilon_decay_value = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING)
+epsilon_decay_value = 0.01
 
 q_table = np.random.uniform(low=-2, high=0, size=(DISCRETE_OS_SIZE + [env.action_space.n]))
 
@@ -30,6 +31,8 @@ aggr_ep_rewards = {'ep': [], 'avg': [], 'avg': [], 'min': [], 'max': []}
 def get_discrete_state(state):
     discrete_state = (state - env.observation_space.low) / discrete_os_win_size
     return tuple(discrete_state.astype(np.int))
+# start time
+start = time.time()
 
 for episode in range(EPISODES):
     episode_reward = 0
@@ -52,12 +55,12 @@ for episode in range(EPISODES):
         new_discrete_state = get_discrete_state(new_state)
         # if render:
         #     env.render()
-        if not done and not truncated:
+        if not done:
             max_future_q = np.max(q_table[new_discrete_state])
             current_q = q_table[discrete_state + (action,)]
             new_q = (1 - LEARNING_RATE) * current_q + LEARNING_RATE * (reward + DISCOUNT * max_future_q)
             q_table[discrete_state + (action, )] = new_q
-        elif new_state[0] == env.last_freq:
+        elif truncated:
             print(f"we made it on episode {episode}")
             q_table[discrete_state + (action,)] = 0
         
@@ -77,9 +80,24 @@ for episode in range(EPISODES):
 
         print(f'Episode: {episode} avg: {average_reward} min: {min(ep_rewards[-SHOW_EVERY:])} max: {max(ep_rewards[-SHOW_EVERY:])}')
 
+    # save last plot
+    if env.render_mode == 'human':
+        env.close()
+        if episode != EPISODES-1:
+            plt.close(2)
+        else:
+            env.fig.savefig('plot_qlearning.png')
 
-env.close()
+# end time
+end = time.time()
 
+# complete
+print('Complete')
+
+# elapsed time
+print('Elapsed time:', end - start, 'seconds.')
+
+# plot stuff
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['avg'], label='avg')
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['min'], label='min')
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['max'], label='max')
