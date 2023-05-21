@@ -96,9 +96,9 @@ print('Complete')
 print('Elapsed time:', end - start, 'seconds.')
 
 # plot stuff
-figure=plt.figure(1)
+figure = plt.figure(1)
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['avg'], label='avg')
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['min'], label='min')
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['max'], label='max')
 plt.legend(loc=4)
-figure.savefig('train.png')
+figure.savefig('training_plot.png')

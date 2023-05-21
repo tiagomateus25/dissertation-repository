@@ -254,6 +254,8 @@ print('Complete')
 print('Elapsed time:', end - start, 'seconds.')
 
 # results plot
+figure = plt.figure(1)
 plot_durations(show_result=True)
-plt.ioff()
-plt.show()
+figure.savefig('training_plot.png')
+# plt.ioff()
+# plt.show()

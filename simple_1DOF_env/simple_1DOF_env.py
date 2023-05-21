@@ -117,7 +117,7 @@ class simple_1DOF_env(Env):
         plt.xlabel('Steps')
         plt.ylabel('Energy (J)')
         plt.title('Energy per step')
-        self.fig.savefig('plot.png')
+        self.fig.savefig('results_plot.png')
 
 
 # test env
