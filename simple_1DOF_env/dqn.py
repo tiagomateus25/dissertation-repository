@@ -186,14 +186,19 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 1000
+    num_episodes = 10
 else:
-    num_episodes = 1000
+    num_episodes = 10
 
 start = time.time()
 for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
     state = env.reset()
+
+    if env.render_mode == 'human':
+        env.x = np.array([])
+        env.y = np.array([])
+
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
         action = select_action(state)
@@ -231,11 +236,8 @@ for i_episode in range(num_episodes):
 
     # save last plot
     if env.render_mode == 'human':
-        env.close()
-        if i_episode != num_episodes-1:
-            plt.close(2)
-        else:
-            env.fig.savefig('plot.png')
+        if i_episode == num_episodes-1:
+            env.close()
 
 # save trained neural network weights
 timestr = time.strftime("%Y%m%d-%H%M%S")

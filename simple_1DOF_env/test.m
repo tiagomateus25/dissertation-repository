@@ -1,5 +1,3 @@
-function AvPow = avPow(State, Action)
-
 load('a0Out_40_2C.mat')
 load('a0Out_40_4C.mat')
 
@@ -7,9 +5,10 @@ load('a0Out_40_4C.mat')
 syms t w                                                 % Time (t) and angular frequency (w)  symbolic variables
 
 Rc_2C=8.41e+03;
+
 Rc_4C=2*Rc_2C;                                           % Effective resistance of the coils in Ohm
 
-Res_array = [150000,50000,5000, 500]; %%%%%%%%%%%%try only 5 res
+Res_array = [150000,50000,5000, 500]; %%%%%%%%%%%%try only 4 res
 
 nf=101;                                                  % Number of frequency sweep points
 fi=1;                                                    % Initial frequency in Hz
@@ -59,6 +58,8 @@ else
 end
 
 % Time/Frequency response
+% frequency
+ff2 = 1; % 1 Hz
 
 nt=round(SampleRate * Ncicles);
 n1=0:nt;         
@@ -66,75 +67,36 @@ nk=length(f2);
 opts = odeset('RelTol',RelTolOde,'AbsTol',AbsTolOde);
 y_1=zeros(nt+1,4,nk);
 
-% Unpack the state vector from the logged signals.
-
-State = double(State);
-ff2 = State(1);    % Input frequency
-
-dt=1/(SampleRate*ff2);                                                         % dt = 1/(SampleRate*f1); tfinal = (nt-1)*dt ~ Ncicles/ff
+dt=1/(SampleRate*ff2);                                                        
 t0=n1*dt;                                   
 ww=2*pi*ff2;
 
-% Check if the given action is valid.
-if ~ismember(Action,1:8)
-    error('Action does not exist within array');
+AvPow = [];
+Energy = [];
+for k=1:8
+    Action = k;
+    index_pos_2C = find((1:4)==Action);
+    index_pos_4C = find((5:8)==Action);
+    if index_pos_2C
+        a0Out = a0Out_40_2C;
+        Rc = Rc_2C;
+        Res = Res_array(index_pos_2C);
+    elseif index_pos_4C
+        a0Out = a0Out_40_4C;
+        Rc = Rc_4C;
+        Res = Res_array(index_pos_4C);
+    end
+
+    % Low frequency approximation (wL << R) (Interpolate a0Out.mat from Magnetics.m).
+    [t1,y] = ode45(@(t,y) [y(2); movTFz(t,ww)+(y(1)+Plength+Xcm)*movtFz(t,ww)+Fg_m(t,ww)+Fmag_m_int(y,a0Out,mMassi)+Flrz_m_int(y,a0Out,mMassi,Res,Rc)+Ffric_mf(y(2),Dampf,Dampc_m,Dampf1,movTFz(t,ww)+(y(1)+Plength+Xcm)*movtFz(t,ww)+Fg_m(t,ww)+Fmag_m_int(y,a0Out,mMassi)+Flrz_m_int(y,a0Out,mMassi,Res,Rc))], t0, y0(1:2), opts);
+    y(:,3)=-y(:,2).*(interp1(a0Out(:,1),a0Out(:,3),y(:,1),'linear','extrap')./(Res+Rc));
+    y_1(:,4)=Res*y(:,3);
+    
+    t_1 = t1;                                                                    % Time
+    y_1(:,1:3)=y;                                                                % Output [delta, ddelta/dt, I, V] vs time
+    Pow=y_1(:,3).*y_1(:,4);                                                      % Output power vs time (I*V)
+    AvPow=(sum(Pow)-(1/2)*(Pow(1)+Pow(end)))/nt;                       % Output average power
+    Energy=[Energy AvPow*(t1(2)-t1(1))];                                                   % Output energy
 end
 
-index_pos_2C = find((1:4)==Action);
-index_pos_4C = find((5:8)==Action);
-if index_pos_2C
-    a0Out = a0Out_40_2C;
-    Rc = Rc_2C;
-    Res = Res_array(index_pos_2C);
-elseif index_pos_4C
-    a0Out = a0Out_40_4C;
-    Rc = Rc_4C;
-    Res = Res_array(index_pos_4C);
-end
-
-% Low frequency approximation (wL << R) (Interpolate a0Out.mat from Magnetics.m).
-[t1,y] = ode45(@(t,y) [y(2); movTFz(t,ww)+(y(1)+Plength+Xcm)*movtFz(t,ww)+Fg_m(t,ww)+Fmag_m_int(y,a0Out,mMassi)+Flrz_m_int(y,a0Out,mMassi,Res,Rc)+Ffric_mf(y(2),Dampf,Dampc_m,Dampf1,movTFz(t,ww)+(y(1)+Plength+Xcm)*movtFz(t,ww)+Fg_m(t,ww)+Fmag_m_int(y,a0Out,mMassi)+Flrz_m_int(y,a0Out,mMassi,Res,Rc))], t0, y0(1:2), opts);
-y(:,3)=-y(:,2).*(interp1(a0Out(:,1),a0Out(:,3),y(:,1),'linear','extrap')./(Res+Rc));
-y_1(:,4)=Res*y(:,3);
-
-t_1 = t1;                                                                    % Time
-y_1(:,1:3)=y;                                                                % Output [delta, ddelta/dt, I, V] vs time
-Pow=y_1(:,3).*y_1(:,4);                                                      % Output power vs time (I*V)
-AvPow=(sum(Pow)-(1/2)*(Pow(1)+Pow(end)))/nt;                                 % Output average power
-
-% new_freq = ff2 + 1;
-% total_AvPow = Init_AvPow + AvPow;
-
-% if new_freq == 6
-%     % Perform Euler integration.
-%     LoggedSignals.State = [1; 0; total_AvPow];
-% 
-%     % Transform state to observation.
-%     NextObs = LoggedSignals.State;
-% 
-%     % Check terminal condition.
-%     IsDone = NextObs(3) < Init_total_AvPow;
-% 
-%     if ~IsDone
-%         % Get reward
-%         Reward = 1;
-%     else
-%         % Get reward
-%         Reward = -10;
-%     end
-% 
-% else
-%     % Perform Euler integration.
-%     LoggedSignals.State = [new_freq; total_AvPow; Init_total_AvPow];
-% 
-%     % Transform state to observation.
-%     NextObs = LoggedSignals.State;
-% 
-%     % Check terminal condition.
-%     IsDone = false;
-% 
-%     % Get reward
-%     Reward = 0;
-% end
-
-end
+Energy = Energy'
