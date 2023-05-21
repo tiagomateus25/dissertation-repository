@@ -56,17 +56,17 @@ class complex_1DOF_env(Env):
         self.current_state = self.state
         
         # calculate average power
-        AveragePower = eng.avPow(self.current_state, action+1)
+        energy = eng.energy(self.current_state, action+1)
 
         # calculate next frequency
         new_freq = self.current_state[0] + 1
 
         # sum average power
-        total_AvPow = self.current_state[1] + AveragePower
+        total_energy = self.current_state[1] + energy
 
         # check terminal condition and calculate reward
         if new_freq == self.last_freq:
-            self.state = np.array([self.init_freq, 0, total_AvPow], dtype=np.float32)
+            self.state = np.array([self.init_freq, 0, total_energy], dtype=np.float32)
             if  self.state[2] < self.current_state[2]:
                 reward = -10
                 terminated = True
@@ -75,7 +75,7 @@ class complex_1DOF_env(Env):
                 reward = 1
                 terminated = False
         else:
-            self.state = np.array([new_freq, total_AvPow, self.current_state[2]], dtype=np.float32)
+            self.state = np.array([new_freq, total_energy, self.current_state[2]], dtype=np.float32)
             terminated = False
             reward = 0
         # info 
@@ -96,9 +96,7 @@ class complex_1DOF_env(Env):
 
 
 # test env
-
 # env = complex_1DOF_env()
-
 # episodes = 1
 # for episode in range(1, episodes+1):
 #     state = env.reset()
