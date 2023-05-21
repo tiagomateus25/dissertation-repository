@@ -41,6 +41,10 @@ for episode in range(EPISODES):
     done = False
     truncated = False
 
+    if env.render_mode == 'human':
+        env.x = np.array([])
+        env.y = np.array([])
+    
     while not done and not truncated:
 
         if np. random.random() > epsilon:
@@ -70,7 +74,6 @@ for episode in range(EPISODES):
     ep_rewards.append(episode_reward)
 
     if not episode % SHOW_EVERY:
-
         average_reward = sum(ep_rewards[-SHOW_EVERY:]) / len(ep_rewards[-SHOW_EVERY:])
         aggr_ep_rewards['ep'].append(episode)
         aggr_ep_rewards['avg'].append(average_reward)
@@ -80,11 +83,8 @@ for episode in range(EPISODES):
 
     # save last plot
     if env.render_mode == 'human':
-        env.close()
-        if episode != EPISODES-1:
-            plt.close(2)
-        else:
-            env.fig.savefig('plot_qlearning.png')
+        if episode == EPISODES-1:
+            env.close()
 
 # end time
 end = time.time()
@@ -96,8 +96,9 @@ print('Complete')
 print('Elapsed time:', end - start, 'seconds.')
 
 # plot stuff
+figure=plt.figure(1)
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['avg'], label='avg')
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['min'], label='min')
 plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['max'], label='max')
 plt.legend(loc=4)
-plt.show()
+figure.savefig('train.png')
