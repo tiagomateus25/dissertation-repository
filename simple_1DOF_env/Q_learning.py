@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 from simple_1DOF_env import simple_1DOF_env
 import numpy as np
 import matplotlib.pyplot as plt
