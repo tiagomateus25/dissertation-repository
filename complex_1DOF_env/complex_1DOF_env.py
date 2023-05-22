@@ -95,6 +95,7 @@ class complex_1DOF_env(Env):
             self.state = np.array([new_Freq, self.amplitude, total_Energy, self.current_state[3]], dtype=np.float32)
             terminated = False
             reward = 0
+            
         # info 
         info = {}
         
@@ -140,33 +141,33 @@ class complex_1DOF_env(Env):
 
 
 # test env
-env = complex_1DOF_env(render_mode='human')
-episodes = 3
-for episode in range(1, episodes+1):
-    state = env.reset()
-    terminated = False
-    truncated = False
-    score = 0
-    steps = 0
+# env = complex_1DOF_env(render_mode='human')
+# episodes = 3
+# for episode in range(1, episodes+1):
+#     state = env.reset()
+#     terminated = False
+#     truncated = False
+#     score = 0
+#     steps = 0
 
-    if env.render_mode == 'human':
-        env.x = np.array([])
-        env.y = np.array([])
+#     if env.render_mode == 'human':
+#         env.x = np.array([])
+#         env.y = np.array([])
 
-    start = time.time()
-    while not terminated and not truncated:
-        action = env.action_space.sample()
-        n_state, reward, terminated, truncated, info = env.step(action)
-        score += reward
-        steps+= 1
-    print('Episode:{} Score:{}'.format(episode, score))
-    print('Number of steps:', steps)
+#     start = time.time()
+#     while not terminated and not truncated:
+#         action = env.action_space.sample()
+#         n_state, reward, terminated, truncated, info = env.step(action)
+#         score += reward
+#         steps+= 1
+#     print('Episode:{} Score:{}'.format(episode, score))
+#     print('Number of steps:', steps)
 
-    end = time.time()
-    print('Elapsed time is', end - start, 'seconds.')
+#     end = time.time()
+#     print('Elapsed time is', end - start, 'seconds.')
 
-    # save last plot
-    if env.render_mode == 'human':
-        if episode == episodes:
-            env.close()
+#     # save last plot
+#     if env.render_mode == 'human':
+#         if episode == episodes:
+#             env.close()
 
