@@ -13,7 +13,7 @@ EPISODES = 150
 
 SHOW_EVERY = 10
 
-DISCRETE_OS_SIZE = [1, 1, 8] 
+DISCRETE_OS_SIZE = [8, 8, 8] 
 discrete_os_win_size = (env.observation_space.high - env.observation_space.low) / DISCRETE_OS_SIZE
 
 epsilon = 1

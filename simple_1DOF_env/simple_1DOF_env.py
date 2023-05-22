@@ -113,7 +113,7 @@ class simple_1DOF_env(Env):
             self.x = np.append(self.x, self.steps)
 
             # y axis: energy
-            self.y = np.append(self.y, self.state[1])
+            self.y = np.append(self.y, self.state[2])
             
     def close(self):
         # plot results
