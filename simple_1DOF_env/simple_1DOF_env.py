@@ -68,8 +68,8 @@ class simple_1DOF_env(Env):
         self.current_state = self.state
         
         # calculate energy
-        Energy = eng.energy(self.current_state, action+1)
-        self.state = np.array([self.init_freq, self.amplitude, Energy], dtype=np.float32)
+        self.energy = eng.energy(self.current_state, action+1)
+        self.state = np.array([self.init_freq, self.amplitude, self.energy], dtype=np.float32)
 
         # rendering
         if self.render_mode == 'human':
@@ -111,7 +111,7 @@ class simple_1DOF_env(Env):
             # x axis: step
             self.x = np.append(self.x, self.steps)
 
-            # y axis: average power
+            # y axis: energy
             self.y = np.append(self.y, self.state[1])
             
     def close(self):
@@ -119,7 +119,7 @@ class simple_1DOF_env(Env):
         self.fig = plt.figure(2)
         plt.scatter(self.x, self.y)
         plt.plot(self.x, self.y)
-        plt.xlabel('Steps')
+        plt.xlabel('Step')
         plt.ylabel('Energy (J)')
         plt.title('Energy per step')
         self.fig.savefig('results_plot.png')
