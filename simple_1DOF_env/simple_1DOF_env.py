@@ -123,7 +123,7 @@ class simple_1DOF_env(Env):
         plt.xlabel('Step')
         plt.ylabel('Energy (J)')
         plt.title('Energy per step')
-        self.fig.savefig('results_plot.png')
+        self.fig.savefig('qlresults_1Hz.png')
 
 
 # test env
