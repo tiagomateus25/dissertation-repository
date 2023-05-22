@@ -186,9 +186,9 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 1000
+    num_episodes = 900
 else:
-    num_episodes = 1000
+    num_episodes = 900
 
 start = time.time()
 for i_episode in range(num_episodes):
@@ -256,6 +256,6 @@ print('Elapsed time:', end - start, 'seconds.')
 # results plot
 figure = plt.figure(1)
 plot_durations(show_result=True)
-figure.savefig('training_plot.png')
+figure.savefig('dqn_training_1Hz.png')
 # plt.ioff()
 # plt.show()
