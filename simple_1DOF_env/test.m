@@ -95,8 +95,9 @@ for k=1:8
     t_1 = t1;                                                                    % Time
     y_1(:,1:3)=y;                                                                % Output [delta, ddelta/dt, I, V] vs time
     Pow=y_1(:,3).*y_1(:,4);                                                      % Output power vs time (I*V)
-    AvPow=(sum(Pow)-(1/2)*(Pow(1)+Pow(end)))/nt;                       % Output average power
+    AvPow=(sum(Pow)-(1/2)*(Pow(1)+Pow(end)))/nt;
+    % AvPow=[AvPow (sum(Pow)-(1/2)*(Pow(1)+Pow(end)))/nt];                       % Output average powe
     Energy=[Energy AvPow*(t1(2)-t1(1))];                                                   % Output energy
 end
-
+% AvPow = AvPow'
 Energy = Energy'
