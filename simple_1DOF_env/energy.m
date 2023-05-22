@@ -44,10 +44,15 @@ mMassi=20.1455*1e-3;         % 7.4e3*(2*mL(i)*pi*(mPo(i)^2-mPi(i)^2));%+8.49e-3;
 g_acel=9.80665;              % Gravitational acceleration in m/s^2
 Dampc_m=Dampc/mMassi;
 
+% Unpack the state vector.
+State = double(State);
+ff2 = State(1); % Input frequency
+amplitude = State(2); % Input amplitude
+
 % Calculations
 f2=linspace(fi,ff,nf);
 
-dT3dt2=diff(T3,t,2); dT2dt2=diff(T2,t,2); dT1dt2=diff(T1,t,2); 
+dT3dt2=diff(T3,t,amplitude); dT2dt2=diff(T2,t,amplitude); dT1dt2=diff(T1,t,amplitude); 
 movTFz=matlabFunction(-cos(beta)*dT3dt2+sin(beta)*cos(alpha)*dT2dt2-sin(beta)*sin(alpha)*dT1dt2,'vars',{'t','w'}); % Fictitious force due to translations/mass
 dalphadt=diff(alpha,t,1); dbetadt=diff(beta,t,1); 
 movtFz=matlabFunction((dbetadt.^2)+(dalphadt.^2).*(sin(beta).^2),'vars',{'t','w'}); % Fictitious force due to rotations/mass
@@ -65,11 +70,6 @@ n1=0:nt;
 nk=length(f2);
 opts = odeset('RelTol',RelTolOde,'AbsTol',AbsTolOde);
 y_1=zeros(nt+1,4,nk);
-
-% Unpack the state vector from the logged signals.
-
-State = double(State);
-ff2 = State(1);    % Input frequency
 
 dt=1/(SampleRate*ff2);                                                         % dt = 1/(SampleRate*f1); tfinal = (nt-1)*dt ~ Ncicles/ff
 t0=n1*dt;                                   

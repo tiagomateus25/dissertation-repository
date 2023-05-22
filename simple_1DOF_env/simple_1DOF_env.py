@@ -18,6 +18,9 @@ class simple_1DOF_env(Env):
         self.init_freq = 1
         self.last_freq = 6
 
+        # amplitude
+        self.amplitude = 2
+
         # truncation
         self.steps = 0
         self.max_episode_steps = 20
@@ -26,6 +29,7 @@ class simple_1DOF_env(Env):
         low = np.array(
             [
                 self.init_freq,
+                self.amplitude,
                 0
             ],
             dtype=np.float32,
@@ -35,6 +39,7 @@ class simple_1DOF_env(Env):
         high = np.array(
             [
                 self.last_freq,
+                6,
                 100
             ],
             dtype=np.float32,
@@ -53,7 +58,7 @@ class simple_1DOF_env(Env):
 
     def reset(self):
         # reset state
-        self.state = np.array([self.init_freq, 0], dtype=np.float32)
+        self.state = np.array([self.init_freq, self.amplitude, 0], dtype=np.float32)
 
         # return reset state
         return np.array(self.state, dtype=np.float32)
@@ -63,15 +68,15 @@ class simple_1DOF_env(Env):
         self.current_state = self.state
         
         # calculate energy
-        Energy = eng.energy(self.current_state[0], action+1)
-        self.state = np.array([self.init_freq, Energy], dtype=np.float32)
+        Energy = eng.energy(self.current_state, action+1)
+        self.state = np.array([self.init_freq, self.amplitude, Energy], dtype=np.float32)
 
         # rendering
         if self.render_mode == 'human':
             self.render()
 
         # check terminal condition and calculate reward
-        if self.state[1] < self.current_state[1]:
+        if self.state[2] < self.current_state[2]:
             reward = -100
             terminated = True
         else:
@@ -121,7 +126,7 @@ class simple_1DOF_env(Env):
 
 
 # test env
-# env = simple_1DOF_env(render_mode='human')
+env = simple_1DOF_env(render_mode='human')
 # episodes = 5
 # for episode in range(1, episodes+1):
 #     state = env.reset()
