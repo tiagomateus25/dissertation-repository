@@ -22,7 +22,7 @@ class complex_1DOF_env(Env):
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 1000
+        self.max_episode_steps = 20
 
         # low states
         low = np.array(
@@ -69,13 +69,17 @@ class complex_1DOF_env(Env):
         self.current_state = self.state
         
         # calculate average power
-        Energy = eng.energy(self.current_state, action+1)
+        self.energy = eng.energy(self.current_state, action+1)
 
         # calculate next frequency
         new_Freq = self.current_state[0] + 1
 
         # sum average power
-        total_Energy = self.current_state[2] + Energy
+        total_Energy = self.current_state[2] + self.energy
+
+        # rendering
+        if self.render_mode == 'human':
+            self.render()
 
         # check terminal condition and calculate reward
         if new_Freq == self.last_freq:
@@ -101,11 +105,30 @@ class complex_1DOF_env(Env):
         # return
         return np.array(self.state, dtype=np.float32), reward, terminated, truncated, info
        
-    def render():
-        pass
+    def render(self):
+        if self.render_mode is None:
+            gym.logger.warn(
+                "You are calling render method without specifying any render mode. "
+                "You can specify the render_mode at initialization, "
+                f'e.g. gym("{self.spec.id}", render_mode="rgb_array")'
+            )
+            return
+        if self.render_mode == 'human':
+            # x axis: step
+            self.x = np.append(self.x, self.current_state[0])
+
+            # y axis: energy
+            self.y = np.append(self.y, self.energy)
 
     def close(self):
-        pass
+        # plot results
+        self.fig = plt.figure(2)
+        plt.scatter(self.x, self.y)
+        plt.plot(self.x, self.y)
+        plt.xlabel('Frequency')
+        plt.ylabel('Energy (J)')
+        plt.title('Energy per step')
+        self.fig.savefig('results_plot.png')
 
 
 # test env

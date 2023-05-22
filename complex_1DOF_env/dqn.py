@@ -14,7 +14,7 @@ import torch.nn.functional as F
 import time
 from complex_1DOF_env import complex_1DOF_env
 
-env = complex_1DOF_env()
+env = complex_1DOF_env(render_mode='human')
 
 # set up matplotlib
 is_ipython = 'inline' in matplotlib.get_backend()
@@ -59,7 +59,7 @@ EPS_START = 1.0
 EPS_END = 0.02
 EPS_DECAY = 1000
 TAU = 0.005
-LR = 1e-4
+LR = 1e-3
     
 class DQN(nn.Module):
 
@@ -190,9 +190,15 @@ if torch.cuda.is_available():
 else:
     num_episodes = 50000
 
+start = time.time()
 for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
     state = env.reset()
+    
+    if env.render_mode == 'human':
+        env.x = np.array([])
+        env.y = np.array([])
+
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
         action = select_action(state)
@@ -222,19 +228,34 @@ for i_episode in range(num_episodes):
             target_net_state_dict[key] = policy_net_state_dict[key]*TAU + target_net_state_dict[key]*(1-TAU)
         target_net.load_state_dict(target_net_state_dict)
 
+        # chech if terminated or truncated
         if done:
             episode_durations.append(t + 1)
             plot_durations()
             break
         
-    if truncated:
-        # Save trained neural network weights
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
-        torch.save(policy_net.state_dict(), nn_filename)
-        break
+    # save last plot
+    if env.render_mode == 'human':
+        if i_episode == num_episodes-1:
+            env.close()
 
+# save trained neural network weights
+timestr = time.strftime("%Y%m%d-%H%M%S")
+nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
+torch.save(policy_net.state_dict(), nn_filename)
+
+# end time
+end = time.time()
+
+# complete
+print('Complete')
+
+# elapsed time
+print('Elapsed time:', end - start, 'seconds.')
+
+# results plot
+figure = plt.figure(1)
 print('Complete')
 plot_durations(show_result=True)
-plt.ioff()
-plt.show()
+# plt.ioff()
+# plt.show()
