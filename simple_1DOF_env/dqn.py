@@ -118,7 +118,7 @@ def plot_durations(show_result=False):
     plt.figure(1)
     durations_t = torch.tensor(episode_durations, dtype=torch.float)
     if show_result:
-        plt.title('Result')
+        plt.title('Training result')
     else:
         plt.clf()
         plt.title('Training...')
