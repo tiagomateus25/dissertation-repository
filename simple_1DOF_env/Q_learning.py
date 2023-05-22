@@ -13,7 +13,7 @@ EPISODES = 150
 
 SHOW_EVERY = 10
 
-DISCRETE_OS_SIZE = [8] * len(env.observation_space.high)
+DISCRETE_OS_SIZE = [1, 1, 8] 
 discrete_os_win_size = (env.observation_space.high - env.observation_space.low) / DISCRETE_OS_SIZE
 
 epsilon = 1
@@ -45,7 +45,6 @@ for episode in range(EPISODES):
         env.y = np.array([])
     
     while not done and not truncated:
-
         if np. random.random() > epsilon:
             action = np.argmax(q_table[discrete_state])
 
