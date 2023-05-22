@@ -38,7 +38,7 @@ class complex_1DOF_env(Env):
         # high states
         high = np.array(
             [
-                self.last_freq,     # frequency (Hz)
+                120,     # frequency (Hz)
                 6,                  # amplitude (m/s²)
                 100,                # energy (J)
                 100                 # total energy (J)
@@ -95,7 +95,6 @@ class complex_1DOF_env(Env):
             self.state = np.array([new_Freq, self.amplitude, total_Energy, self.current_state[3]], dtype=np.float32)
             terminated = False
             reward = 0
-            
         # info 
         info = {}
         
