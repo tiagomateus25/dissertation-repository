@@ -132,23 +132,23 @@ class complex_1DOF_env(Env):
 
 
 # test env
-# env = complex_1DOF_env()
-# episodes = 1
-# for episode in range(1, episodes+1):
-#     state = env.reset()
-#     terminated = False
-#     truncated = False
-#     score = 0
-#     steps = 0
-#     start = time.time()
-#     while not terminated and not truncated:
-#         action = env.action_space.sample()
-#         n_state, reward, terminated, truncated, info = env.step(action)
-#         score += reward
-#         steps+= 1
-#     print('Episode:{} Score:{}'.format(episode, score))
-#     print('Number of steps:', steps)
-#     end = time.time()
-#     print('Elapsed time is', end - start, 'seconds.')
-# env.close()
+env = complex_1DOF_env(render_mode='human')
+episodes = 1
+for episode in range(1, episodes+1):
+    state = env.reset()
+    terminated = False
+    truncated = False
+    score = 0
+    steps = 0
+    start = time.time()
+    while not terminated and not truncated:
+        action = env.action_space.sample()
+        n_state, reward, terminated, truncated, info = env.step(action)
+        score += reward
+        steps+= 1
+    print('Episode:{} Score:{}'.format(episode, score))
+    print('Number of steps:', steps)
+    end = time.time()
+    print('Elapsed time is', end - start, 'seconds.')
+env.close()
 
