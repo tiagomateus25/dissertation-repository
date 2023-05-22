@@ -22,15 +22,15 @@ class complex_1DOF_env(Env):
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 20
+        self.max_episode_steps = 120
 
         # low states
         low = np.array(
             [
-                self.init_freq,
-                self.amplitude,
-                0,
-                0,
+                self.init_freq,     # frequency (Hz)
+                1,                  # amplitude (m/s²)
+                0,                  # energy (J)
+                0,                  # total energy (J)
             ],
             dtype=np.float32,
         )
@@ -38,10 +38,10 @@ class complex_1DOF_env(Env):
         # high states
         high = np.array(
             [
-                self.last_freq,
-                6,
-                100,
-                100
+                self.last_freq,     # frequency (Hz)
+                6,                  # amplitude (m/s²)
+                100,                # energy (J)
+                100                 # total energy (J)
             ],
             dtype=np.float32,
         )
@@ -81,8 +81,8 @@ class complex_1DOF_env(Env):
         if self.render_mode == 'human':
             self.render()
 
-        # check terminal condition and calculate reward
-        if new_Freq == self.last_freq:
+        # calculate terminal condition, reward and new state
+        if self.current_state[0] == self.last_freq:
             self.state = np.array([self.init_freq, self.amplitude, 0, total_Energy], dtype=np.float32)
             if  self.state[3] < self.current_state[3]:
                 reward = -100
@@ -107,12 +107,14 @@ class complex_1DOF_env(Env):
        
     def render(self):
         if self.render_mode is None:
+            # error warning
             gym.logger.warn(
                 "You are calling render method without specifying any render mode. "
                 "You can specify the render_mode at initialization, "
                 f'e.g. gym("{self.spec.id}", render_mode="rgb_array")'
             )
             return
+        
         if self.render_mode == 'human':
             # x axis: step
             self.x = np.append(self.x, self.current_state[0])
@@ -121,10 +123,16 @@ class complex_1DOF_env(Env):
             self.y = np.append(self.y, self.energy)
 
     def close(self):
+        # split and stack data for plotting
+        self.x = np.split(self.x, len(self.x)/self.last_freq)
+        self.x = np.vstack(self.x)
+        self.y = np.split(self.y, len(self.y)/self.last_freq)
+        self.y = np.vstack(self.y)
+
         # plot results
         self.fig = plt.figure(2)
-        plt.scatter(self.x, self.y)
-        plt.plot(self.x, self.y)
+        plt.scatter(self.x.T, self.y.T)
+        plt.plot(self.x.T, self.y.T)
         plt.xlabel('Frequency')
         plt.ylabel('Energy (J)')
         plt.title('Energy per step')
@@ -133,13 +141,18 @@ class complex_1DOF_env(Env):
 
 # test env
 env = complex_1DOF_env(render_mode='human')
-episodes = 1
+episodes = 3
 for episode in range(1, episodes+1):
     state = env.reset()
     terminated = False
     truncated = False
     score = 0
     steps = 0
+
+    if env.render_mode == 'human':
+        env.x = np.array([])
+        env.y = np.array([])
+
     start = time.time()
     while not terminated and not truncated:
         action = env.action_space.sample()
@@ -148,7 +161,12 @@ for episode in range(1, episodes+1):
         steps+= 1
     print('Episode:{} Score:{}'.format(episode, score))
     print('Number of steps:', steps)
+
     end = time.time()
     print('Elapsed time is', end - start, 'seconds.')
-env.close()
+
+    # save last plot
+    if env.render_mode == 'human':
+        if episode == episodes:
+            env.close()
 
