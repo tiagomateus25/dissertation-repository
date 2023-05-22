@@ -1,4 +1,4 @@
-function AvPow = avPow(State, Action)
+function Energy = energy(State, Action)
 
 load('a0Out_40_2C.mat')
 load('a0Out_40_4C.mat')
@@ -44,10 +44,15 @@ mMassi=20.1455*1e-3;         % 7.4e3*(2*mL(i)*pi*(mPo(i)^2-mPi(i)^2));%+8.49e-3;
 g_acel=9.80665;              % Gravitational acceleration in m/s^2
 Dampc_m=Dampc/mMassi;
 
+% Unpack the state vector.
+State = double(State);
+ff2 = State(1); % Input frequency
+amplitude = State(2); % Input amplitude
+
 % Calculations
 f2=linspace(fi,ff,nf);
 
-dT3dt2=diff(T3,t,2); dT2dt2=diff(T2,t,2); dT1dt2=diff(T1,t,2); 
+dT3dt2=diff(T3,t,amplitude); dT2dt2=diff(T2,t,amplitude); dT1dt2=diff(T1,t,amplitude); 
 movTFz=matlabFunction(-cos(beta)*dT3dt2+sin(beta)*cos(alpha)*dT2dt2-sin(beta)*sin(alpha)*dT1dt2,'vars',{'t','w'}); % Fictitious force due to translations/mass
 dalphadt=diff(alpha,t,1); dbetadt=diff(beta,t,1); 
 movtFz=matlabFunction((dbetadt.^2)+(dalphadt.^2).*(sin(beta).^2),'vars',{'t','w'}); % Fictitious force due to rotations/mass
@@ -65,11 +70,6 @@ n1=0:nt;
 nk=length(f2);
 opts = odeset('RelTol',RelTolOde,'AbsTol',AbsTolOde);
 y_1=zeros(nt+1,4,nk);
-
-% Unpack the state vector from the logged signals.
-
-State = double(State);
-ff2 = State(1);    % Input frequency
 
 dt=1/(SampleRate*ff2);                                                         % dt = 1/(SampleRate*f1); tfinal = (nt-1)*dt ~ Ncicles/ff
 t0=n1*dt;                                   
@@ -97,44 +97,9 @@ end
 y(:,3)=-y(:,2).*(interp1(a0Out(:,1),a0Out(:,3),y(:,1),'linear','extrap')./(Res+Rc));
 y_1(:,4)=Res*y(:,3);
 
-t_1 = t1;                                                                    % Time
+% t1 - time
 y_1(:,1:3)=y;                                                                % Output [delta, ddelta/dt, I, V] vs time
 Pow=y_1(:,3).*y_1(:,4);                                                      % Output power vs time (I*V)
 AvPow=(sum(Pow)-(1/2)*(Pow(1)+Pow(end)))/nt;                                 % Output average power
-
-% new_freq = ff2 + 1;
-% total_AvPow = Init_AvPow + AvPow;
-
-% if new_freq == 6
-%     % Perform Euler integration.
-%     LoggedSignals.State = [1; 0; total_AvPow];
-% 
-%     % Transform state to observation.
-%     NextObs = LoggedSignals.State;
-% 
-%     % Check terminal condition.
-%     IsDone = NextObs(3) < Init_total_AvPow;
-% 
-%     if ~IsDone
-%         % Get reward
-%         Reward = 1;
-%     else
-%         % Get reward
-%         Reward = -10;
-%     end
-% 
-% else
-%     % Perform Euler integration.
-%     LoggedSignals.State = [new_freq; total_AvPow; Init_total_AvPow];
-% 
-%     % Transform state to observation.
-%     NextObs = LoggedSignals.State;
-% 
-%     % Check terminal condition.
-%     IsDone = false;
-% 
-%     % Get reward
-%     Reward = 0;
-% end
-
+Energy=AvPow*(t1(2)-t1(1));                                                  % Output energy
 end

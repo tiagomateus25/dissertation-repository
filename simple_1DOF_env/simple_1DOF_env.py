@@ -7,7 +7,7 @@ import matlab.engine
 from typing import Optional
 import time
 import matplotlib.pyplot as plt
-import math
+
 
 eng = matlab.engine.start_matlab()
 
@@ -126,7 +126,7 @@ class simple_1DOF_env(Env):
 
 
 # test env
-env = simple_1DOF_env(render_mode='human')
+# env = simple_1DOF_env(render_mode='human')
 # episodes = 5
 # for episode in range(1, episodes+1):
 #     state = env.reset()

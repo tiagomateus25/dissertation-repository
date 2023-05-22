@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
+import gymnasium as gym
 from gym import Env
 from gym.spaces import Discrete, Box
 import numpy as np
 import matlab.engine
+from typing import Optional
 import time
+import matplotlib.pyplot as plt
 
 eng = matlab.engine.start_matlab()
 
 class complex_1DOF_env(Env):
-    def __init__(self):
+    def __init__(self, render_mode: Optional[str] = None):
 
         # frequencies
         self.init_freq = 1
         self.last_freq = 6
+
+        # amplitude
+        self.amplitude = 2
 
         # truncation
         self.steps = 0
@@ -22,6 +28,7 @@ class complex_1DOF_env(Env):
         low = np.array(
             [
                 self.init_freq,
+                self.amplitude,
                 0,
                 0,
             ],
@@ -32,6 +39,7 @@ class complex_1DOF_env(Env):
         high = np.array(
             [
                 self.last_freq,
+                6,
                 100,
                 100
             ],
@@ -44,9 +52,14 @@ class complex_1DOF_env(Env):
         # observation space
         self.observation_space = Box(low, high, dtype=np.float32)
 
+        # render
+        self.render_mode = render_mode
+        self.x = np.array([])
+        self.y = np.array([])
+
     def reset(self):
         # reset state
-        self.state = np.array([self.init_freq, 0, 0], dtype=np.float32)
+        self.state = np.array([self.init_freq, self.amplitude, 0, 0], dtype=np.float32)
 
         # return reset state
         return np.array(self.state, dtype=np.float32)
@@ -56,26 +69,26 @@ class complex_1DOF_env(Env):
         self.current_state = self.state
         
         # calculate average power
-        energy = eng.energy(self.current_state, action+1)
+        Energy = eng.energy(self.current_state, action+1)
 
         # calculate next frequency
-        new_freq = self.current_state[0] + 1
+        new_Freq = self.current_state[0] + 1
 
         # sum average power
-        total_energy = self.current_state[1] + energy
+        total_Energy = self.current_state[2] + Energy
 
         # check terminal condition and calculate reward
-        if new_freq == self.last_freq:
-            self.state = np.array([self.init_freq, 0, total_energy], dtype=np.float32)
-            if  self.state[2] < self.current_state[2]:
-                reward = -10
+        if new_Freq == self.last_freq:
+            self.state = np.array([self.init_freq, self.amplitude, 0, total_Energy], dtype=np.float32)
+            if  self.state[3] < self.current_state[3]:
+                reward = -100
                 terminated = True
                 self.steps = 0
             else:
                 reward = 1
                 terminated = False
         else:
-            self.state = np.array([new_freq, total_energy, self.current_state[2]], dtype=np.float32)
+            self.state = np.array([new_Freq, self.amplitude, total_Energy, self.current_state[3]], dtype=np.float32)
             terminated = False
             reward = 0
         # info 
