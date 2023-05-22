@@ -28,9 +28,9 @@ class simple_1DOF_env(Env):
         # low states
         low = np.array(
             [
-                self.init_freq,
-                self.amplitude,
-                0
+                self.init_freq,     # frequency (Hz)
+                1,                  # amplitude (m/s²)
+                0                   # energy (J)
             ],
             dtype=np.float32,
         )
@@ -38,9 +38,9 @@ class simple_1DOF_env(Env):
         # high states
         high = np.array(
             [
-                self.last_freq,
-                6,
-                100
+                self.last_freq,     # frequency (Hz)
+                6,                  # amplitude (m/s²)
+                100                 # energy (J) 
             ],
             dtype=np.float32,
         )
@@ -100,6 +100,7 @@ class simple_1DOF_env(Env):
        
     def render(self):
         if self.render_mode is None:
+            # error warning
             gym.logger.warn(
                 "You are calling render method without specifying any render mode. "
                 "You can specify the render_mode at initialization, "
