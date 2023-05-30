@@ -23,14 +23,14 @@ class simple_1DOF_env(Env):
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 20
+        self.max_episode_steps = 10
 
         # low states
         low = np.array(
             [
-                self.init_freq,     # frequency (Hz)
-                1,                  # amplitude (m/s²)
-                0                   # energy (J)
+                0,              # frequency (Hz)
+                0,              # amplitude (m/s²)
+                0.96e-9       # energy (J)
             ],
             dtype=np.float32,
         )
@@ -38,9 +38,9 @@ class simple_1DOF_env(Env):
         # high states
         high = np.array(
             [
-                self.last_freq,     # frequency (Hz)
-                6,                  # amplitude (m/s²)
-                100                 # energy (J) 
+                7,              # frequency (Hz)
+                7,              # amplitude (m/s²)
+                0.16e-7       # energy (J) 
             ],
             dtype=np.float32,
         )

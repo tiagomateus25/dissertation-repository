@@ -22,15 +22,15 @@ class complex_1DOF_env(Env):
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 120
+        self.max_episode_steps = 60
 
         # low states
         low = np.array(
             [
-                self.init_freq,     # frequency (Hz)
-                1,                  # amplitude (m/s²)
-                0,                  # energy (J)
-                0,                  # total energy (J)
+                0,                  # frequency (Hz)
+                0,                  # amplitude (m/s²)
+                0.4e-5,                  # energy (J)
+                0.4e-5,                  # total energy (J)
             ],
             dtype=np.float32,
         )
@@ -38,10 +38,10 @@ class complex_1DOF_env(Env):
         # high states
         high = np.array(
             [
-                120,     # frequency (Hz)
-                6,                  # amplitude (m/s²)
-                100,                # energy (J)
-                100                 # total energy (J)
+                7,                   # frequency (Hz)
+                7,                   # amplitude (m/s²)
+                0.76e-4,                   # energy (J)
+                0.76e-4                    # total energy (J)
             ],
             dtype=np.float32,
         )
@@ -95,12 +95,18 @@ class complex_1DOF_env(Env):
             self.state = np.array([new_Freq, self.amplitude, total_Energy, self.current_state[3]], dtype=np.float32)
             terminated = False
             reward = 0
-        # info 
-        info = {}
         
         # check if truncated
         self.steps += 1
         truncated = self.steps >= self.max_episode_steps
+        
+        # reset steps if terminated or truncated
+        done = terminated or truncated
+        if done:
+            self.steps = 0
+
+        # info 
+        info = {}
 
         # return
         return np.array(self.state, dtype=np.float32), reward, terminated, truncated, info

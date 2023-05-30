@@ -9,20 +9,20 @@ env.reset()
 
 LEARNING_RATE = 0.1
 DISCOUNT = 0.99
-EPISODES = 10
+EPISODES = 200
 
 SHOW_EVERY = 10
 
-DISCRETE_OS_SIZE = [6,1,1716,1716]
+DISCRETE_OS_SIZE = [1] * len(env.observation_space.high)
 discrete_os_win_size = (env.observation_space.high - env.observation_space.low) / DISCRETE_OS_SIZE
 
 epsilon = 1
 START_EPSILON_DECAYING = 1
-END_EPSILON_DECAYING = 1000
-# epsilon_decay_value = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING)
-epsilon_decay_value = 0.01
+END_EPSILON_DECAYING = 100
+epsilon_decay_value = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING)
 
-q_table = np.random.uniform(low=-100, high=1, size=(DISCRETE_OS_SIZE + [env.action_space.n]))
+
+q_table = np.random.uniform(low=-2, high=0, size=(DISCRETE_OS_SIZE + [env.action_space.n]))
 
 ep_rewards = []
 aggr_ep_rewards = {'ep': [], 'avg': [], 'avg': [], 'min': [], 'max': []}
