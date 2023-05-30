@@ -18,7 +18,7 @@ class complex_1DOF_env(Env):
         self.last_freq = 6
 
         # amplitude
-        self.amplitude = 2
+        self.amplitude = 20
 
         # truncation
         self.steps = 0
@@ -39,7 +39,7 @@ class complex_1DOF_env(Env):
         high = np.array(
             [
                 7,                   # frequency (Hz)
-                7,                   # amplitude (m/s²)
+                21,                   # amplitude (m/s²)
                 0.76e-4,                   # energy (J)
                 0.76e-4                    # total energy (J)
             ],

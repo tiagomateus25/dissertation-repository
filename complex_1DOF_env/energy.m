@@ -14,9 +14,13 @@ Res_array = [150000,50000,5000, 500]; %%%%%%%%%%%%try only 5 res
 nf=101;                                                  % Number of frequency sweep points
 fi=1;                                                    % Initial frequency in Hz
 ff=6;                                                    % Final  frequency in Hz
-% nf2=1001;
 
-Amplitude=(20E-3)*(w^2);                                 % sym(10) % Acceleration Amplitude in m/s^2 (parameter in analytical solution with forcing term -d2Tdt2=Amplitude*cos(w*t)) (e.g. =sym(10), constant acceleration; =(1E-3)*(w^2), constant displacement)
+% Unpack the state vector.
+State = double(State);
+ff2 = State(1);                                          % Input frequency (Hz)
+amplitude = State(2);                                    % Input amplitude (m/s^2)
+
+Amplitude=(amplitude*E-3)*(w^2);                         % sym(10) % Acceleration Amplitude in m/s^2 (parameter in analytical solution with forcing term -d2Tdt2=Amplitude*cos(w*t)) (e.g. =sym(10), constant acceleration; =(1E-3)*(w^2), constant displacement)
 T3=Amplitude*(1/(w^2))*cos(w*t);                         % Translation vector components in m as functions of time (t) (e.g. Amplitude*(1/(w^2))*cos(w*t), acceleration = -A.cos(w.t))
 T2=sym(0);
 T1=sym(0);
@@ -44,15 +48,10 @@ mMassi=20.1455*1e-3;         % 7.4e3*(2*mL(i)*pi*(mPo(i)^2-mPi(i)^2));%+8.49e-3;
 g_acel=9.80665;              % Gravitational acceleration in m/s^2
 Dampc_m=Dampc/mMassi;
 
-% Unpack the state vector.
-State = double(State);
-ff2 = State(1); % Input frequency
-amplitude = State(2); % Input amplitude
-
 % Calculations
 f2=linspace(fi,ff,nf);
 
-dT3dt2=diff(T3,t,amplitude); dT2dt2=diff(T2,t,amplitude); dT1dt2=diff(T1,t,amplitude); 
+dT3dt2=diff(T3,t,2); dT2dt2=diff(T2,t,2); dT1dt2=diff(T1,t,2); 
 movTFz=matlabFunction(-cos(beta)*dT3dt2+sin(beta)*cos(alpha)*dT2dt2-sin(beta)*sin(alpha)*dT1dt2,'vars',{'t','w'}); % Fictitious force due to translations/mass
 dalphadt=diff(alpha,t,1); dbetadt=diff(beta,t,1); 
 movtFz=matlabFunction((dbetadt.^2)+(dalphadt.^2).*(sin(beta).^2),'vars',{'t','w'}); % Fictitious force due to rotations/mass

@@ -19,7 +19,7 @@ class simple_1DOF_env(Env):
         self.last_freq = 6
 
         # amplitude
-        self.amplitude = 2
+        self.amplitude = 20
 
         # truncation
         self.steps = 0
@@ -39,7 +39,7 @@ class simple_1DOF_env(Env):
         high = np.array(
             [
                 7,              # frequency (Hz)
-                7,              # amplitude (m/s²)
+                21,              # amplitude (m/s²)
                 0.16e-7       # energy (J) 
             ],
             dtype=np.float32,
