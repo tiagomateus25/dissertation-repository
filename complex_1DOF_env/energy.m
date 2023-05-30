@@ -20,7 +20,7 @@ State = double(State);
 ff2 = State(1);                                          % Input frequency (Hz)
 amplitude = State(2);                                    % Input amplitude (m/s^2)
 
-Amplitude=(amplitude*E-3)*(w^2);                         % sym(10) % Acceleration Amplitude in m/s^2 (parameter in analytical solution with forcing term -d2Tdt2=Amplitude*cos(w*t)) (e.g. =sym(10), constant acceleration; =(1E-3)*(w^2), constant displacement)
+Amplitude=(amplitude*1E-3)*(w^2);                         % sym(10) % Acceleration Amplitude in m/s^2 (parameter in analytical solution with forcing term -d2Tdt2=Amplitude*cos(w*t)) (e.g. =sym(10), constant acceleration; =(1E-3)*(w^2), constant displacement)
 T3=Amplitude*(1/(w^2))*cos(w*t);                         % Translation vector components in m as functions of time (t) (e.g. Amplitude*(1/(w^2))*cos(w*t), acceleration = -A.cos(w.t))
 T2=sym(0);
 T1=sym(0);
