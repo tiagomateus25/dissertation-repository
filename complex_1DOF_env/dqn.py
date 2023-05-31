@@ -55,11 +55,11 @@ class ReplayMemory(object):
 # BATCH_SIZE = 128    # original
 BATCH_SIZE = 256
 GAMMA = 0.99
-EPS_START = 1.0
-EPS_END = 0.0005
-EPS_DECAY = 10000
+EPS_START = 0.9
+EPS_END = 0.05
+EPS_DECAY = 1000    # try 2000
 TAU = 0.005
-LR = 1e-3
+LR = 1e-3   # try 1e-4
     
 class DQN(nn.Module):
 
@@ -186,9 +186,9 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 20000
+    num_episodes = 8000
 else:
-    num_episodes = 20000
+    num_episodes = 8000
 
 start = time.time()
 for i_episode in range(num_episodes):
@@ -257,5 +257,6 @@ print('Elapsed time:', end - start, 'seconds.')
 figure = plt.figure(1)
 print('Complete')
 plot_durations(show_result=True)
+figure.savefig('dqn_training.png')
 # plt.ioff()
 # plt.show()

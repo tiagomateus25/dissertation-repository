@@ -256,6 +256,6 @@ print('Elapsed time:', end - start, 'seconds.')
 # results plot
 figure = plt.figure(1)
 plot_durations(show_result=True)
-figure.savefig('dqn_training_1Hz.png')
+figure.savefig('dqn_training.png')
 # plt.ioff()
 # plt.show()
