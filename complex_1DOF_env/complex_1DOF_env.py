@@ -7,6 +7,8 @@ import matlab.engine
 from typing import Optional
 import time
 import matplotlib.pyplot as plt
+import pickle
+
 
 eng = matlab.engine.start_matlab()
 
@@ -18,7 +20,7 @@ class complex_1DOF_env(Env):
         self.last_freq = 6
 
         # amplitude
-        self.amplitude = 20
+        self.amplitude = 5
 
         # truncation
         self.steps = 0
@@ -135,14 +137,18 @@ class complex_1DOF_env(Env):
         self.y = np.split(self.y, len(self.y)/self.last_freq)
         self.y = np.vstack(self.y)
 
+        # save variable in a file
+        with open('amplitude_5.pkl', 'wb') as file:
+            pickle.dump([self.x.T, self.y.T], file)
+
         # plot results
-        self.fig = plt.figure(2)
-        plt.scatter(self.x.T, self.y.T)
-        plt.plot(self.x.T, self.y.T)
-        plt.xlabel('Frequency')
-        plt.ylabel('Energy (J)')
-        plt.title('Energy per step')
-        self.fig.savefig('results_plot.png')
+        # self.fig = plt.figure(2)
+        # plt.scatter(self.x.T, self.y.T)
+        # plt.plot(self.x.T, self.y.T)
+        # plt.xlabel('Frequency')
+        # plt.ylabel('Energy (J)')
+        # plt.title('Energy per step')
+        # self.fig.savefig('results_plot.png')
 
 
 # test env
@@ -176,3 +182,14 @@ class complex_1DOF_env(Env):
 #         if episode == episodes:
 #             env.close()
 
+# with open('amplitude_5.pkl', 'rb') as file:
+#     a = pickle.load(file)
+# print(a[1])
+
+# plt.figure(1)
+# plt.scatter(a[0], a[1])
+# plt.plot(a[0], a[1])
+# plt.xlabel('Frequency')
+# plt.ylabel('Energy (J)')
+# plt.title('Energy per step')
+# plt.show()

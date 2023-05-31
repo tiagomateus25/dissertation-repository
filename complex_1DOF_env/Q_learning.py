@@ -9,7 +9,7 @@ env.reset()
 
 LEARNING_RATE = 0.1
 DISCOUNT = 0.99
-EPISODES = 200
+EPISODES = 75
 
 SHOW_EVERY = 10
 
@@ -18,7 +18,7 @@ discrete_os_win_size = (env.observation_space.high - env.observation_space.low) 
 
 epsilon = 1
 START_EPSILON_DECAYING = 1
-END_EPSILON_DECAYING = 100
+END_EPSILON_DECAYING = EPISODES / 2
 epsilon_decay_value = epsilon / (END_EPSILON_DECAYING - START_EPSILON_DECAYING)
 
 
@@ -94,12 +94,12 @@ print('Complete')
 print('Elapsed time:', end - start, 'seconds.')
 
 # plot stuff
-figure = plt.figure(1)
-plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['avg'], label='avg')
-plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['min'], label='min')
-plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['max'], label='max')
-plt.legend(loc=4)
-plt.xlabel('Episodes')
-plt.ylabel('Reward')
-plt.title('Training Result')
-figure.savefig('training_plot.png')
+# figure = plt.figure(1)
+# plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['avg'], label='avg')
+# plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['min'], label='min')
+# plt.plot(aggr_ep_rewards['ep'], aggr_ep_rewards['max'], label='max')
+# plt.legend(loc=4)
+# plt.xlabel('Episodes')
+# plt.ylabel('Reward')
+# plt.title('Training Result')
+# figure.savefig('training_plot.png')
