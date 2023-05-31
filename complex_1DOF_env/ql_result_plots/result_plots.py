@@ -33,7 +33,7 @@ plt.plot(a5[0], a5[1], c='blue')
 
 plt.xlabel('Frequency')
 plt.ylabel('Energy (J)')
-plt.title('Energy per step')
+plt.title('Energy per frequency')
 plt.legend(["Amplitude: 20 mm", "Amplitude: 15 mm", "Amplitude: 10 mm", "Amplitude: 5 mm"])
 # plt.show()
 fig.savefig('results_plot.png')
