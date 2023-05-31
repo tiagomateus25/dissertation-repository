@@ -8,12 +8,13 @@ Rc_2C=8.41e+03;
 Rc_4C=2*Rc_2C;                                           % Effective resistance of the coils in Ohm
 Res_array = [150000,50000,5000, 500]; %%%%%%%%%%%%try only 4 res
 
+Amplitude = 15;
 % Environment constants
 syms t w                                                 % Time (t) and angular frequency (w)  symbolic variables
 nf=101;                                                  % Number of frequency sweep points
 fi=1;                                                    % Initial frequency in Hz
 ff=6;                                                    % Final  frequency in Hz
-Amplitude=(20E-3)*(w^2);                                 % sym(10) % Acceleration Amplitude in m/s^2 (parameter in analytical solution with forcing term -d2Tdt2=Amplitude*cos(w*t)) (e.g. =sym(10), constant acceleration; =(1E-3)*(w^2), constant displacement)
+Amplitude=(Amplitude*1E-3)*(w^2);                        % sym(10) % Acceleration Amplitude in m/s^2 (parameter in analytical solution with forcing term -d2Tdt2=Amplitude*cos(w*t)) (e.g. =sym(10), constant acceleration; =(1E-3)*(w^2), constant displacement)
 T3=Amplitude*(1/(w^2))*cos(w*t);                         % Translation vector components in m as functions of time (t) (e.g. Amplitude*(1/(w^2))*cos(w*t), acceleration = -A.cos(w.t))
 T2=sym(0);
 T1=sym(0);
