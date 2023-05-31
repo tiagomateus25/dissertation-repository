@@ -1,4 +1,4 @@
-clc; clear; close all;
+% clc; clear; close all;
 
 load('a0Out_40_2C.mat')
 load('a0Out_40_4C.mat')
@@ -8,7 +8,7 @@ Rc_2C=8.41e+03;
 Rc_4C=2*Rc_2C;                                           % Effective resistance of the coils in Ohm
 Res_array = [150000,50000,5000, 500]; %%%%%%%%%%%%try only 4 res
 
-Amplitude = 15;
+Amplitude = 5;
 % Environment constants
 syms t w                                                 % Time (t) and angular frequency (w)  symbolic variables
 nf=101;                                                  % Number of frequency sweep points
@@ -95,7 +95,7 @@ for ff2 = 1:6  % 1 Hz
     
     Energy_freq(:,ff2) = Energy;
 end
-disp(Energy_freq)
+% disp(Energy_freq)
 % get the max energy value for each frequency
 Max_Energy_freq = max(Energy_freq);
 disp(Max_Energy_freq)
