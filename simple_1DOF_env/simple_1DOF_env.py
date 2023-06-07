@@ -152,3 +152,23 @@ class simple_1DOF_env(Env):
 #         else:
 #             env.fig.savefig('plot.png')
 
+# calculate energy values
+# amplitude = np.array([5, 10, 15, 20])
+# actions = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+
+# c = np.array([])
+# for amp in amplitude:
+#     current_state = np.array([[1, amp], [2, amp], [3, amp], [4, amp], [5, amp], [6, amp]])
+#     b = np.array([], dtype=np.float32)
+#     for i in current_state:
+#         a = np.array([], dtype=np.float32)
+#         for k in actions:
+#             # calculate average power
+#             energy = eng.energy(i, actions[k-1])
+#             a = np.append(a, energy)
+#         max = np.max(a)
+#         b = np.append(b, max)
+#     sum = np.sum(b)
+#     c = np.append(c, sum)
+
+# print(c)
