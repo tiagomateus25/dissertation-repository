@@ -24,10 +24,10 @@ plt.ion()
 
 # if gpu is to be used
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward'))
-
 
 class ReplayMemory(object):
 
@@ -52,32 +52,30 @@ class ReplayMemory(object):
 # TAU is the update rate of the target network
 # LR is the learning rate of the AdamW optimizer
 
-# BATCH_SIZE = 128    # original
-BATCH_SIZE = 256
+BATCH_SIZE = 512     # 128 original
 GAMMA = 0.99
-EPS_START = 0.9
-EPS_END = 0.05
-EPS_DECAY = 1000    # try 2000
-TAU = 0.005
-LR = 1e-3   # try 1e-4
-    
+EPS_START = 0.9      # 0.9 original
+EPS_END = 0.05          # 0.05 original
+EPS_DECAY = 1000     # 1000 original   
+TAU = 0.005              # 0.005 original   
+LR = 1e-4            # 1e-5 original
+   
 class DQN(nn.Module):
 
     def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
-        self.layer1 = nn.Linear(n_observations, 128)
-        self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, n_actions)
+        self.layer1 = nn.Linear(n_observations, 64)
+        # self.layer2 = nn.Linear(64, 64)
+        self.layer3 = nn.Linear(64, n_actions)
 
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
     def forward(self, x):
         x = F.relu(self.layer1(x))
-        x = F.relu(self.layer2(x))
+        # x = F.relu(self.layer2(x))
 
         return self.layer3(x)
-
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
@@ -112,7 +110,6 @@ def select_action(state):
 
 
 episode_durations = []
-
 
 def plot_durations(show_result=False):
     plt.figure(1)
@@ -186,9 +183,9 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 8000
+    num_episodes = 12000
 else:
-    num_episodes = 8000
+    num_episodes = 12000
 
 start = time.time()
 for i_episode in range(num_episodes):

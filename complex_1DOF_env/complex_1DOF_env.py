@@ -24,15 +24,15 @@ class complex_1DOF_env(Env):
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 60
+        self.max_episode_steps = 120
 
         # low states
         low = np.array(
             [
                 0,                  # frequency (Hz)
                 0,                  # amplitude (m/s²)
-                0.4e-5,             # energy (J)
-                0.4e-5,             # total energy (J)
+                0,                  # energy (J)
+                0                   # total energy (J)
             ],
             dtype=np.float32,
         )
@@ -40,10 +40,10 @@ class complex_1DOF_env(Env):
         # high states
         high = np.array(
             [
-                7,                   # frequency (Hz)
-                21,                   # amplitude (m/s²)
-                0.76e-4,                   # energy (J)
-                0.76e-4                    # total energy (J)
+                7,                  # frequency (Hz)
+                21,                 # amplitude (m/s²)
+                0.76e-4,            # energy (J)
+                0.76e-4             # total energy (J)
             ],
             dtype=np.float32,
         )
@@ -87,7 +87,7 @@ class complex_1DOF_env(Env):
         if self.current_state[0] == self.last_freq:
             self.state = np.array([self.init_freq, self.amplitude, 0, total_Energy], dtype=np.float32)
             if  self.state[3] < self.current_state[3]:
-                reward = -10
+                reward = -100
                 terminated = True
                 self.steps = 0
             else:
@@ -106,13 +106,14 @@ class complex_1DOF_env(Env):
         done = terminated or truncated
         if done:
             self.steps = 0
-
+        
         # info 
         info = {}
 
         # return
         return np.array(self.state, dtype=np.float32), reward, terminated, truncated, info
        
+    
     def render(self):
         if self.render_mode is None:
             # error warning
@@ -194,6 +195,7 @@ class complex_1DOF_env(Env):
 # plt.title('Energy per step')
 # plt.show()
 
+# ---------------------------------------------------------------------------------------------------
 
 # calculate energy values
 # amplitude = np.array([5, 10, 15, 20])
