@@ -14,6 +14,7 @@ import torch.nn.functional as F
 import time
 from complex_1DOF_env import complex_1DOF_env
 
+
 env = complex_1DOF_env(render_mode='human')
 
 # set up matplotlib
@@ -52,22 +53,21 @@ class ReplayMemory(object):
 # TAU is the update rate of the target network
 # LR is the learning rate of the AdamW optimizer
 
-BATCH_SIZE = 512     # 128 original
+BATCH_SIZE = 128     # 128 original
 GAMMA = 0.99
 EPS_START = 0.9      # 0.9 original
-EPS_END = 0.05          # 0.05 original
-EPS_DECAY = 1000     # 1000 original   
+EPS_END = 0          # 0.05 original
+EPS_DECAY = 1500      # 1000 original   
 TAU = 0.005              # 0.005 original   
-LR = 1e-4            # 1e-5 original
+LR = 1e-3           # 1e-5 original
    
 class DQN(nn.Module):
 
     def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
         self.layer1 = nn.Linear(n_observations, 64)
-        # self.layer2 = nn.Linear(64, 64)
+        # self.layer2 = nn.Linear(128, 128)
         self.layer3 = nn.Linear(64, n_actions)
-
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
@@ -98,6 +98,7 @@ def select_action(state):
     sample = random.random()
     eps_threshold = EPS_END + (EPS_START - EPS_END) * \
         math.exp(-1. * steps_done / EPS_DECAY)
+    print(eps_threshold)
     steps_done += 1
     if sample > eps_threshold:
         with torch.no_grad():
@@ -108,23 +109,22 @@ def select_action(state):
     else:
         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
 
+episode_rewards = []
 
-episode_durations = []
-
-def plot_durations(show_result=False):
+def plot_reward(show_result=False):
     plt.figure(1)
-    durations_t = torch.tensor(episode_durations, dtype=torch.float)
+    rewards_t = torch.tensor(episode_rewards, dtype=torch.float)
     if show_result:
         plt.title('Result')
     else:
         plt.clf()
         plt.title('Training...')
     plt.xlabel('Episode')
-    plt.ylabel('Duration')
-    plt.plot(durations_t.numpy())
+    plt.ylabel('Reward')
+    plt.plot(rewards_t.numpy())
     # Take 100 episode averages and plot them too
-    if len(durations_t) >= 100:
-        means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
+    if len(rewards_t) >= 100:
+        means = rewards_t.unfold(0, 100, 1).mean(1).view(-1)
         means = torch.cat((torch.zeros(99), means))
         plt.plot(means.numpy())
 
@@ -183,15 +183,21 @@ def optimize_model():
     optimizer.step()
 
 if torch.cuda.is_available():
-    num_episodes = 12000
+    num_episodes = 2000
 else:
-    num_episodes = 12000
+    num_episodes = 2000
 
+# start time
 start = time.time()
+
 for i_episode in range(num_episodes):
     # Initialize the environment and get it's state
     state = env.reset()
-    
+
+    # Accumulative reward for
+    reward_plot = 0
+
+    # Render
     if env.render_mode == 'human':
         env.x = np.array([])
         env.y = np.array([])
@@ -200,9 +206,10 @@ for i_episode in range(num_episodes):
     for t in count():
         action = select_action(state)
         observation, reward, terminated, truncated ,info = env.step(action.item())
+        reward_plot += reward
         reward = torch.tensor([reward], device=device)
         done = terminated or truncated
-
+        
         if terminated:
             next_state = None
         else:
@@ -227,19 +234,19 @@ for i_episode in range(num_episodes):
 
         # chech if terminated or truncated
         if done:
-            episode_durations.append(t + 1)
-            plot_durations()
+            episode_rewards.append(reward_plot)
+            plot_reward()
             break
-        
+
     # save last plot
     if env.render_mode == 'human':
         if i_episode == num_episodes-1:
             env.close()
 
 # save trained neural network weights
-timestr = time.strftime("%Y%m%d-%H%M%S")
-nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
-torch.save(policy_net.state_dict(), nn_filename)
+# timestr = time.strftime("%Y%m%d-%H%M%S")
+# nn_filename = "dqnAgent_Trained_Model_" + timestr + ".pth"
+# torch.save(policy_net.state_dict(), nn_filename)
 
 # end time
 end = time.time()
@@ -253,7 +260,7 @@ print('Elapsed time:', end - start, 'seconds.')
 # results plot
 figure = plt.figure(1)
 print('Complete')
-plot_durations(show_result=True)
+plot_reward(show_result=True)
 figure.savefig('dqn_training.png')
-# plt.ioff()
-# plt.show()
+plt.ioff()
+plt.show()

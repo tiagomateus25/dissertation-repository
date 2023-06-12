@@ -20,11 +20,11 @@ class complex_1DOF_env(Env):
         self.last_freq = 6
 
         # amplitude
-        self.amplitude = 20
+        self.amplitude = 15
 
         # truncation
         self.steps = 0
-        self.max_episode_steps = 120
+        self.max_episode_steps = 6
 
         # low states
         low = np.array(
@@ -82,21 +82,21 @@ class complex_1DOF_env(Env):
         # rendering
         if self.render_mode == 'human':
             self.render()
-
+        
         # calculate terminal condition, reward and new state
         if self.current_state[0] == self.last_freq:
             self.state = np.array([self.init_freq, self.amplitude, 0, total_Energy], dtype=np.float32)
             if  self.state[3] < self.current_state[3]:
-                reward = -100
                 terminated = True
                 self.steps = 0
-            else:
-                reward = 1
+                reward = 0
+            else: 
                 terminated = False
+                reward = self.energy * 1e5
         else:
             self.state = np.array([new_Freq, self.amplitude, total_Energy, self.current_state[3]], dtype=np.float32)
             terminated = False
-            reward = 0
+            reward = self.energy * 1e5
         
         # check if truncated
         self.steps += 1
@@ -113,7 +113,6 @@ class complex_1DOF_env(Env):
         # return
         return np.array(self.state, dtype=np.float32), reward, terminated, truncated, info
        
-    
     def render(self):
         if self.render_mode is None:
             # error warning
@@ -139,17 +138,17 @@ class complex_1DOF_env(Env):
         self.y = np.vstack(self.y)
 
         # save variable in a file
-        with open('amplitude_20.pkl', 'wb') as file:
+        with open('amplitude_15.pkl', 'wb') as file:
             pickle.dump([self.x.T, self.y.T], file)
 
         # plot results
-        self.fig = plt.figure(2)
-        plt.scatter(self.x.T, self.y.T)
-        plt.plot(self.x.T, self.y.T)
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Energy (J)')
-        plt.title('Energy per step')
-        self.fig.savefig('results_plot.png')
+        # self.fig = plt.figure(2)
+        # plt.scatter(self.x.T, self.y.T)
+        # plt.plot(self.x.T, self.y.T)
+        # plt.xlabel('Frequency (Hz)')
+        # plt.ylabel('Energy (J)')
+        # plt.title('Energy per step')
+        # self.fig.savefig('results_plot.png')
 
 
 # test env
@@ -197,7 +196,7 @@ class complex_1DOF_env(Env):
 
 # ---------------------------------------------------------------------------------------------------
 
-# calculate energy values
+# # calculate energy values
 # amplitude = np.array([5, 10, 15, 20])
 # actions = np.array([1, 2, 3, 4, 5, 6, 7, 8])
 
