@@ -20,7 +20,7 @@ class complex_1DOF_env(Env):
         self.last_freq = 6
 
         # amplitude
-        self.amplitude = 15
+        self.amplitude = 20
 
         # truncation
         self.steps = 0
@@ -138,7 +138,7 @@ class complex_1DOF_env(Env):
         self.y = np.vstack(self.y)
 
         # save variable in a file
-        with open('amplitude_15.pkl', 'wb') as file:
+        with open('amplitude_20.pkl', 'wb') as file:
             pickle.dump([self.x.T, self.y.T], file)
 
         # plot results
